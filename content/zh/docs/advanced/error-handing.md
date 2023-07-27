@@ -77,7 +77,7 @@ func (t Type) String() string {
 
 ## 使用说明
 
-### 1.1使用New创建一个错误
+### 使用New创建一个错误
 
 ```Go
 import "phanes/errors"
@@ -96,7 +96,7 @@ if err := c.ShouldBindJSON(&u); err != nil {
 
 ```
 
-### 1.2 包装一个错误
+### 包装一个错误
 
 ```Go
 import "phanes/errors"
@@ -117,7 +117,7 @@ if err := c.ShouldBindJSON(&u); err != nil {
 
 > 当你包装一个错误时，也可以像New一样，不填写后面的错误信息，规则和New一样
 
-##  错误断言
+##  断言
 
 ```Go
 import "phanes/errors"
@@ -144,3 +144,67 @@ if errType == 1000 {
 }
 
 ```
+
+## 对外可见性（暴露错误）
+
+由于错误的类型不同，错误的对外可见性也不一样，并且，有时候有些错误是需要经过处理之后才可以暴露出去的（比如数据库的错误是需要经过处理才能暴露的），那么我们就需要自己有一个错误处理的方案，这里我们可以灵活的去控制一个错误是否需要暴露给外部。具体代码在 `server/web/middleware/util.go` 
+
+当前的可见性规则是：如果不是我们 errors 包中定义的错误就会判定为不可见错误
+
+{{< details "具体判定具体代码">}}
+```go
+if errType == errors.None {
+  // 当错误类型为 None 时说明不是我们的错误类型，即内部错误，我们可以选择不暴露此类错误
+  // check request params
+  if errs, ok := e.Err.(validator.ValidationErrors); ok {
+    c.JSON(http.StatusBadRequest, gin.H{
+      "trace_id": traceID,
+      "code":     errType,
+      "msg":      RemoveTopStruct(errs.Translate(translate)),
+    })
+  } else {
+    // some can't show error
+    c.JSON(http.StatusInternalServerError, gin.H{
+      "trace_id": traceID,
+      "code":     500,
+      "msg":      "Server Internal Error",
+    })
+  }
+// 如果错误类型是我们自定义的，我们也可以选择是否暴露此错误
+} else if errType == 1000 {
+  c.JSON(http.StatusUnauthorized, nil)
+  // hello Common errors handle
+} else if errType > 1000 && errType < 2000 {
+  c.JSON(http.StatusOK, gin.H{
+    "trace_id": traceID,
+    "code":     errType,
+    "msg":      e.Error(),
+  })
+  // customer error handle here
+} else if errType >= 2000 && errType < 3000 {
+  c.JSON(http.StatusOK, gin.H{
+    "trace_id": traceID,
+    "code":     errType,
+    "msg":      e.Error(),
+  })
+}
+
+```
+{{< /details >}}
+
+你可以简单的使用我们的规则，定义新的错误类型，并在业务代码中进行错误处理来决定是否暴露，如数据库查时为空，们先定义一个新的错误类型 `errors/error_type.go`
+```go
+RecordNotFound Type = 3000
+```
+
+然后在 bll 中使用此错误
+```go
+if err = a.iUser.Find(in.UserId); err != nil && err = gorm.RecordNotFound {
+  // 此错误信息将暴露给外部，但不会给出数据库的具体错误信息，这个错误是你自己在 errors 包中定义的错误信息
+  return errors.RecordNotFound.New("data not found")
+}else {
+  // 这个错误将显示 InternalServerError
+  return err
+}
+```
+> 得益于我们的整体架构设计，使得我们的错误处理更加优雅
