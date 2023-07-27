@@ -15,12 +15,12 @@ toc: true
 
 ## 前置需求
 
-- [Git](https://git-scm.com/) — 最新版本
-- [Golang](https://go.dev/) — 大于1.19
-- [protoc](https://grpc.io/docs/protoc-installation/) — 最新版本
-- [protoc-gen-go](https://grpc.io/docs/languages/go/quickstart/) — 最新版本
-- [protoc-gen-go-grpc](https://grpc.io/docs/languages/go/quickstart/) — 最新版本
-- [protoc-gen-micro](https://github.com/go-micro/cli/) — 最新版本
+- [Git](https://git-scm.com/) — 最新版本(必需)
+- [Golang](https://go.dev/) — 大于1.19(必需)
+- [protoc](https://grpc.io/docs/protoc-installation/) — 最新版本(非必需)
+- [protoc-gen-go](https://grpc.io/docs/languages/go/quickstart/) — 最新版本(非必需)
+- [protoc-gen-go-grpc](https://grpc.io/docs/languages/go/quickstart/) — 最新版本(非必需)
+- [protoc-gen-micro](https://github.com/go-micro/cli/) — 最新版本(非必需)
 
 ## 前置知识
 - Go 语言编程基础
@@ -54,9 +54,11 @@ toc: true
 
 ## 开始一个新的项目
 
-安装 `Phanes` 命令工具 → 创建项目 → 生成代码 → 安装依赖 → 修改配置 → 运行你的项目.
+1.安装 `Phanes` 命令工具 → 2.创建项目 → 3.生成代码 → 4.安装依赖 → 5.修改配置 → 6.运行你的项目.
 
-### 安装命令工具
+> 没错，仅需6个步骤，你就可以运行你的微服务项目
+
+### 1.安装命令工具
 
 `phanes` 工具此项目的灵魂，一切由此开始...
 
@@ -64,20 +66,40 @@ toc: true
 go install github.com/phanes-o/phanes@latest
 ```
 
-### 创建项目
-使用 phanes 创建项目非常简单，命令如下：
+### 2.创建项目 
+使用 phanes 创建项目非常简单，这里我们创建一个 `hello` 项目，命令如下：
 
 ```bash
-phanes new project_name
+phanes new hello
 ```
 
-### 生成代码
-{{< details "生成了什么代码" >}}
-phanes 提供了基本的 crud 操作的整套代码(HttpApi、业务、model、entity、数据存储相关代码) 生成代码依赖配置文件 gnenrator.go 此文件名称也是默认配置
+### 3.生成代码
+生成代码依赖配置文件 `generator.go` 此文件也是默认配置文件, 具体如何配置请查看 [代码生成配置→ ]({{< relref "generator" >}})
+
+{{< details "默认配置点这里👈" >}}
+你可以直接复制此配置直接尝试生成 User 相关代码
+```go
+// Yeah! it's so simple.
+package main
+
+import (
+  "time"
+  "github.com/lib/pq"
+)
+
+//project:hello
+type  User struct {
+  Id int64 `rule:"Parameter;Required"`
+  Name string  `rule:"Parameter;Required"`
+  Password string `rule:"Parameter;Required"`
+  Phone string `rule:"Parameter"`
+  Roles []pq.StringArray `rule:"Parameter"`
+  CreatedAt time.Time
+  UpdatedAt time.Time 
+}
+
+```
 {{< /details >}}
-
-生成代码依赖配置文件 `gnenrator.go` 此文件也是默认配置文件, 具体如何配置请查看 [代码生成配置→ ]({{< relref "generator" >}})
-
 使用默认配置文件生成：
 ```bash
 phanes gen
@@ -86,22 +108,88 @@ phanes gen
 ```bash
 phanes gen -c gen.go
 ```
+{{< details "生成了什么代码" >}}
+phanes 提供了基本的 crud 操作的整套代码(HttpApi、业务、model、entity、数据存储相关代码) 生成代码依赖配置文件 gnenrator.go 此文件名称也是默认配置
+{{< /details >}}
 
 
-### 安装依赖
+### 4.安装依赖
 别急，项目启动之前，我们还需要拉去项目的依赖项
 ```bash
 go mod tidy
 ```
 
-### 修改项目配置
+### 5.修改项目配置
 最后一步，真的最后一步，就是修改项目启动配置，就可以启动项目了, 具体配置请查看 [项目配置文件→ ]({{< relref "project" >}})
 
-{{< alert icon="👉" text="如果你只想快速体验，可以将 db 和 broker 配置注释掉" />}}
+{{< alert icon="👉" text="配置文件地址  `hello/script/config.yaml`" />}}
 
-> 注意: 配置文件在  `your_project/script/config.yaml`
+{{< details "默认配置点这里👈" >}}
+```yaml
+name: hello
+env: dev
+version: 0.1.0
+auto_migrate: true
 
-### 运行(Run your project...)
+http:
+  listen: :7771
+  validate_trans: zh
+
+#如果你只想快速体验，可以将 db 和 broker 配置注释掉
+db:
+  - addr: host=127.0.0.1 user=postgres password=root dbname=auth port=5432
+      sslmode=disable TimeZone=Asia/Shanghai
+    pwd: root
+    type: postgres
+    user: root
+  - addr: 127.0.0.1:6379
+    pwd: ""
+    type: redis
+    user: ""
+
+broker:
+  addr: amqp://coco:kk123123123@127.0.0.1:5672/
+  pwd: ""
+  type: rabbitmq
+  user: ""
+
+# otel config
+collect:
+  log:
+    # DebugLevel = -1, InfoLevel = 0, WarnLevel = 1 ErrorLevel = 2, DPanicLevel = 3, PanicLevel = 4, FatalLevel = 5
+    level: -1
+    # log file name
+    file_name: admin
+    # log print prefix
+    prefix: "[PHANES]"
+    # will buffer up to 4096 kilobytes of logs,
+    # waiting at most 10 seconds between flushes.
+    buffer_size: 4096 # kb, default 256kb
+    interval: 10 # second, default 30s
+  metric:
+    # metrics will listen a http port
+    # example: localhost:2223/metrics
+    listen: ":2223"
+  trace:
+    addr: "http://localhost:14268/api/traces"
+
+traefik:
+  # reverse proxy type support: tcp udp http grpc(h2c)
+  type: tcp
+  # support "||" or "&&"
+  rule: "&&"
+  # is enable tls
+  tls: true
+  domain: test.com
+  # is enable traefik reverse proxy
+  enabled: true
+  # match prefix
+  # prefix:
+
+```
+{{< /details >}}
+
+### 6.运行(Run your project...)
 由于项目为微服务项目，启动时必须依赖 etcd， 所以需要在启动之前至少启动 etcd
 
 ```bash

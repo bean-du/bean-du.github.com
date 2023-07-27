@@ -15,3 +15,5 @@ homepage: false
 
 
 ## 成为 Phanes Contributor
+
+欢迎各位大佬成为 Phanes 的贡献者

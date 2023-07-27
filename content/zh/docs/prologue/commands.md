@@ -13,7 +13,7 @@ weight: 130
 toc: true
 ---
 
-## 主要 Commands
+
 - new 创建新的微服务项目
 - gen 生成代码
 - env 环境监察和安装
@@ -23,96 +23,55 @@ toc: true
 > - build 构建命令(在路上...)
 > - deploy 部署命令(在路上...)
 
-创建新的项目
+
+
+## new 创建新的项目
 
 ```bash
 phanes new [name]
 ```
 
-See also the Hugo docs: [hugo new](https://gohugo.io/commands/hugo_new/).
-
-### Docs based tree
-
-Create a docs based tree — with a single command:
+## gen 代码生成
 
 ```bash
-npm run create -- --kind docs [section]
+phanes gen -c [config_file_name]
 ```
 
-For example, create a docs based tree named guides:
+
+## env 环境相关命令
+### 开发运行环境监测
 
 ```bash
-npm run create -- --kind docs guides
+phanes env chech
 ```
 
-## lint
-
-Check scripts, styles, and markdown for errors:
+### 开发环境工具安装
 
 ```bash
-npm run lint
+phanes env install
 ```
 
-### scripts
+## 升级
 
-Check scripts for errors:
-
+### phanes 升级自身
 ```bash
-npm run lint:scripts [-- --fix]
+phanes upgrade
 ```
 
-### styles
-
-Check styles for errors:
-
+### 升级项目代码
+{{< alert icon="👉" text="此命令正在开发中... 欢迎给出建议和方案" />}}
 ```bash
-npm run lint:styles [-- --fix]
+phanes update
 ```
 
-### markdown
-
-Check markdown for errors:
+## build 构建命令
+{{< alert icon="👉" text="此命令正在开发中... 欢迎给出建议和方案" />}}
 
 ```bash
-npm run lint:markdown [-- --fix]
+phanes build
 ```
-
-## clean
-
-Delete temporary directories:
-
+## deploy 部署命令
+{{< alert icon="👉" text="此命令正在开发中... 欢迎给出建议和方案" />}}
 ```bash
-npm run clean
-```
-
-## start
-
-Start local development server:
-
-```bash
-npm run start
-```
-
-## build
-
-Build production website:
-
-```bash
-npm run build
-```
-
-### functions
-
-Build Lambda functions:
-
-```bash
-npm run build:functions
-```
-
-### preview
-
-Build production website including draft and future content:
-
-```bash
-npm run build:preview
+phanes deploy
 ```

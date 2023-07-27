@@ -51,17 +51,17 @@
   url = "/docs/prologue/introduction/"
 
 [[main]]
-  name = "Quick Start"
+  name = "快速开始"
   weight = 40
   identifier = "quick-start"
   url = "/docs/prologue/quick-start/"
   parent = "get-started"
 
 [[main]]
-  name = "Tutorial"
+  name = "学习指南"
   weight = 50
   identifier = "tutorial"
-  url = "https://getdoks.org/tutorial/introduction/"
+  url = "/docs/prologue/introduction/"
   parent = "get-started"
 
 [[social]]
