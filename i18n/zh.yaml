@@ -5,7 +5,7 @@
   translation: "页面导航"
 
 - id: search-text
-  translation: "搜索文档..."
+  translation: "Search..."
 
 - id: 404-title
   translation: "找不到此页面 :("

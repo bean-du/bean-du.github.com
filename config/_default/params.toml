@@ -6,6 +6,8 @@ titleSeparator = "-"
 titleAddition = "极简风的微服务工具集"
 description = "Phanes 是集微服务脚手架, 命令行工具与一体的微服务工具集, 提供了方便的构建命令和各种代码生成命令, 让你能够方便快速的构建微服务项目"
 
+
+googleAnalytics = "G-LDDGVVDVN0"
 ## Documentation
 # docsVersion = "0.3"
 

@@ -137,3 +137,7 @@ toc: true
 |server|项目对外提供的服务，包括http，grpc，tcp等等|
 |store|存储层代码，包括存储接口抽象和具体实现|
 |utils|项目工具集|
+
+
+关系图如下：
+![phanes-structure](/images/phanes-structure.png)
